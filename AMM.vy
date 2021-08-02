@@ -42,22 +42,33 @@ def provideLiquidity(tokenA_addr: address, tokenB_addr: address, tokenA_quantity
 # Trades one token for the other
 @external
 def tradeTokens(sell_token: address, sell_quantity: uint256):
+	
 	assert sell_token == self.tokenA.address or sell_token == self.tokenB.address
 
-	
+	#Your code here
+
 	sell_token.transferFrom(msg.sender, self, sell_quantity)
 
-    new_total_tokens: uint256 = self.totalTokenQty + sell_quantity
-    new_total_eth: uint256 = self.invariant / new_total_tokens
-    eth_to_send: uint256 = self.totalEthQty - new_total_eth
-    send(msg.sender, eth_to_send)
-    self.totalEthQty = new_total_eth
-    self.totalTokenQty = new_total_tokens
+	if sell_token == self.tokenA.address:
+
+	    new_total_A_tokens: uint256 = self.tokenAQty - sell_quantity
+	    new_total_B_tokens: uint256 = self.tokenBQty + sell_quantity
+
+    else:
+
+	    new_total_A_tokens: uint256 = self.tokenAQty + sell_quantity
+	    new_total_B_tokens: uint256 = self.tokenBQty - sell_quantity
+
+	    send(msg.sender, sell_quantity)
+
+	    self.tokenAQty = new_total_A_tokens
+	    self.tokenBQty = new_total_B_tokens
 
 
 
 
-	#Your code here
+
+
 
 # Owner can withdraw their funds and destroy the market maker
 @external
