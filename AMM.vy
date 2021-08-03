@@ -42,25 +42,18 @@ def provideLiquidity(tokenA_addr: address, tokenB_addr: address, tokenA_quantity
 # Trades one token for the other
 @external
 def tradeTokens(sell_token: address, sell_quantity: uint256):
-	
-	assert sell_token == self.tokenA.address or sell_token == self.tokenB.address
-
-	#Your code here
-
-	#sell_token.transferFrom(msg.sender, self, sell_quantity)
-
-	if sell_token == self.tokenA.address:
-
-		self.tokenA.transferFrom(msg.sender, self, sell_quantity)
-
-	    new_total_A_tokens: uint256 = self.tokenAQty - sell_quantity
-	    new_total_B_tokens: uint256 = self.tokenBQty + self.invariant / new_total_A_tokens
-
-  #  else:
-
-  	self.tokenB.transferFrom(msg.sender, self, sell_quantity)
+    assert sell_token == self.tokenA.address or sell_token == self.tokenB.address
 
 
+
+    if sell_token == self.tokenA.address:
+        self.tokenA.transferFrom(msg.sender, self, sell_quantity)
+        new_total_A_tokens: uint256 = self.tokenAQty - sell_quantity
+        new_total_B_tokens: uint256 = self.tokenBQty + self.invariant / new_total_A_tokens
+
+
+
+    self.tokenB.transferFrom(msg.sender, self, sell_quantity)
     new_total_A_tokens: uint256 = self.tokenAQty + sell_quantity
     new_total_B_tokens: uint256 = self.tokenBQty - self.invariant / new_total_A_tokens
 
@@ -74,7 +67,6 @@ def tradeTokens(sell_token: address, sell_quantity: uint256):
 @external
 def ownerWithdraw():
     assert self.owner == msg.sender
-	#Your code here
     self.tokenA.transfer(self.owner, self.tokenAQty)
     self.tokenB.transfer(self.owner, self.tokenBQty)
 
