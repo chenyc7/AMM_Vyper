@@ -44,20 +44,26 @@ def provideLiquidity(tokenA_addr: address, tokenB_addr: address, tokenA_quantity
 def tradeTokens(sell_token: address, sell_quantity: uint256):
     assert sell_token == self.tokenA.address or sell_token == self.tokenB.address
 
-
+    new_total_A_tokens = self.tokenAQty 
+    new_total_B_tokens = self.tokenBQty 
 
     if sell_token == self.tokenA.address:
         self.tokenA.transferFrom(msg.sender, self, sell_quantity)
-        new_total_A_tokens: uint256 = self.tokenAQty - sell_quantity
-        new_total_B_tokens: uint256 = self.tokenBQty + self.invariant / new_total_A_tokens
+        new_total_A_tokens: uint256 = self.tokenAQty + sell_quantity
+        new_total_B_tokens: uint256 = self.invariant / new_total_A_tokens
+        self.tokenB.transfer(msg.sender, tokenBQty - new_total_B_tokens)
+        send(msg.sender, sell_quantity)
+        
 
 
+	if sell_token == self.tokenB.address:
 
-    self.tokenB.transferFrom(msg.sender, self, sell_quantity)
-    new_total_A_tokens: uint256 = self.tokenAQty + sell_quantity
-    new_total_B_tokens: uint256 = self.tokenBQty - self.invariant / new_total_A_tokens
+	    self.tokenB.transferFrom(msg.sender, self, sell_quantity)
+	    new_total_A_tokens: uint256 = self.tokenAQty - sell_quantity
+	    new_total_B_tokens: uint256 = self.invariant / new_total_A_tokens
+	    self.tokenA.transfer(msg.sender, tokenAQty - new_total_A_tokens)
 
-    send(msg.sender, sell_quantity)
+    	send(msg.sender, sell_quantity)
 
     self.tokenAQty = new_total_A_tokens
     self.tokenBQty = new_total_B_tokens
